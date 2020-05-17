@@ -1,0 +1,7 @@
+node_modules
+.idea
+db/
+.vscode
+public/lib
+public/**/*.js.map
+public/**/*.js
