@@ -6,7 +6,10 @@ import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import TextField from '@material-ui/core/TextField';
-import TextareaAutosize from '@material-ui/core/TextareaAutosize';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
 
 import { Formik, Form } from 'formik';
 
@@ -30,34 +33,44 @@ function App() {
 
   const insertFeatures = async (res) => {
     console.log(res);
+    const { endemia, ano, semana, features } = res;
+    console.log(features);
+    console.log(typeof features);
     // TODO get feature do input passado pelo usuário
-    let iFeature = {
-      type: 'FeatureCollection',
-      features: [
+    // eslint-disable-next-line
+    /*
+    {
+      "type":"FeatureCollection",
+      "features": [
         {
-          type: 'Feature',
-          properties: {
-            AGRAVO: 'DENGUE',
+          "type":"Feature",
+          "properties":{
+            "AGRAVO":"DENGUE"
           },
-          geometry: {
-            type: 'Point',
-            coordinates: [null, null],
-            YZXDGBDNHIJAZFRGVSDWADUAWCDCYFXSFLHJDGDCIXSFTBQRQRMEPWLVTXWCFLZUAXJISVAPSVXULRPYVHBQKEXFJTHKWA: [
-              'LTM4LjUzNzI2AVkLuVgFPIbBPwzuMTI=',
-              'fLTMuNzcwMDQ5HpkFpqXOcekIbisMTI=',
+          "geometry":{
+            "type":"Point",
+            "coordinates":[
+                null,
+                null
             ],
-          },
-        },
-      ],
-    };
+            "HZTAUWTPDDFRWTVKXGDLZMELGBJTUVRDSTQFLOWUXGAGDBNHJRCROMHGTHCGODVFHIXDTCIYYFHV":[
+                "LTM4LjQ2OTk3OVvfQtAtBXjEmBToMTI=",
+                "ALTMuODE2MjY5Mg==kifYgpvKoYBMTY="
+            ]
+          }
+        }
+      ]
+    }
+    */
+    let iFeature = {};
 
     let coordinates = '';
-    for (let prop in iFeature.features[0].geometry) {
+    for (let prop in features[0].geometry) {
       if (prop !== 'type' && prop !== 'coordinates') coordinates = prop;
     }
 
     // get latitude e longitude
-    iFeature.features = iFeature.features.map(function (value) {
+    iFeature.features = features.map(function (value) {
       const lon = value.geometry[coordinates][0].substring(0, 16);
       const lat = value.geometry[coordinates][1].substring(1, 17);
 
@@ -73,19 +86,17 @@ function App() {
     });
 
     // get endemia do input
-    iFeature.type = 'CHIKUNGUNYA';
+    iFeature.type = endemia || 'DENGUE';
     // get week do input
-    const week = '29';
-    const ano = '2019';
-    const url = `http://tc1.sms.fortaleza.ce.gov.br/simda/chikungunya/mapaJSON?mapa=true&ano=${ano}&mes=&sem_pri=${ano}${week}&classifin=&criterio=&evolucao=&regional=&id_bairro=&id_unidade=&key=0&anomapa=`;
+    const url = `http://tc1.sms.fortaleza.ce.gov.br/simda/chikungunya/mapaJSON?mapa=true&ano=${ano}&mes=&sem_pri=${ano}${semana}&classifin=&criterio=&evolucao=&regional=&id_bairro=&id_unidade=&key=0&anomapa=`;
     const index = url.indexOf('sem_pri=');
-    iFeature.year = url.substring(index + 8, index + 12);
-    iFeature.week = url.substring(index + 12, index + 14);
+    iFeature.year = url.substring(index + 8, index + 12) || '2020';
+    iFeature.week = url.substring(index + 12, index + 14) || '1';
 
     console.log(iFeature);
     console.log(url);
 
-    if (res) {
+    if (false) {
       let res = await featureService.insertFeature(iFeature);
       setFeatures(iFeature);
       console.log(res);
@@ -113,45 +124,70 @@ function App() {
           )}
 
           <Formik
-            initialValues={{ endemia: '', ano: '', semana: '' }}
+            initialValues={{ endemia: '', ano: '', semana: '', features: '' }}
             onSubmit={(values, { setSubmitting }) => {
               setTimeout(() => {
-                alert(JSON.stringify(values, null, 2));
-                insertFeatures(values);
+                insertFeatures({
+                  ...values,
+                  features: JSON.parse(values.features),
+                });
                 setSubmitting(false);
-              }, 400);
+              }, 100);
             }}
           >
-            {({ isSubmitting, handleBlur, handleChange }) => (
+            {({ isSubmitting, handleBlur, handleChange, values }) => (
               <Form className={classes.root}>
-                <TextField
-                  label="endemia"
-                  name="endemia"
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  margin="normal"
-                />
+                <FormControl className={classes.formControl}>
+                  <InputLabel>Endemia</InputLabel>
+                  <Select
+                    label="endemia"
+                    name="endemia"
+                    value={values.endemia}
+                    onChange={handleChange}
+                  >
+                    <MenuItem value={'DENGUE'}>Dengue</MenuItem>
+                    <MenuItem value={'CHIKUNGUNYA'}>Chikungunya</MenuItem>
+                  </Select>
+                </FormControl>
 
-                <TextField
-                  label="ano"
-                  name="ano"
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  margin="normal"
-                />
+                <FormControl className={classes.formControl}>
+                  <InputLabel>Ano</InputLabel>
+                  <Select
+                    label="ano"
+                    name="ano"
+                    value={values.ano}
+                    onChange={handleChange}
+                  >
+                    <MenuItem value={2016}>2016</MenuItem>
+                    <MenuItem value={2017}>2017</MenuItem>
+                    <MenuItem value={2018}>2018</MenuItem>
+                    <MenuItem value={2019}>2019</MenuItem>
+                    <MenuItem value={2020}>2020</MenuItem>
+                    <MenuItem value={2021}>2021</MenuItem>
+                  </Select>
+                </FormControl>
 
                 <TextField
                   label="semana"
                   name="semana"
+                  type="number"
+                  min={0}
                   onChange={handleChange}
+                  value={values.semana}
+                  inputProps={{ min: '0', max: '52', step: '1' }}
                   onBlur={handleBlur}
                   margin="normal"
                 />
-                <div>
-                  <TextareaAutosize
-                    aria-label="minimum height"
-                    rowsMin={3}
-                    rowsMax={20}
+                <div style={{ width: '620px' }}>
+                  <TextField
+                    label="features"
+                    name="features"
+                    value={values.features}
+                    onChange={handleChange}
+                    rows={10}
+                    multiline
+                    fullWidth
+                    variant="filled"
                     placeholder="Insira aqui o json"
                   />
                 </div>

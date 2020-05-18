@@ -26,20 +26,20 @@ class FeaturesController {
   insertFeature(req, res) {
     console.log('*** insertFeature');
 
-    console.log(req.body);
-    res.json([]);
+    // console.log(req.body);
+    // res.json([]);
 
-    // featuteRepo.insertFeature(req.body, (err, feature) => {
-    //   if (err) {
-    //     console.log(
-    //       '*** featuteRepo.insertFeature error: ' + util.inspect(err)
-    //     );
-    //     res.json({ status: false, error: 'Insert failed', feature: null });
-    //   } else {
-    //     console.log('*** insertFeature ok');
-    //     res.json({ status: true, error: null, feature: feature });
-    //   }
-    // });
+    featuteRepo.insertFeature(req.body, (err, feature) => {
+      if (err) {
+        console.log(
+          '*** featuteRepo.insertFeature error: ' + util.inspect(err)
+        );
+        res.json({ status: false, error: 'Insert failed', feature: null });
+      } else {
+        console.log('*** insertFeature ok');
+        res.json({ status: true, error: null, feature: feature });
+      }
+    });
   }
 
   updateFeature(req, res) {
