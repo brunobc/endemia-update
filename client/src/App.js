@@ -88,10 +88,11 @@ function App() {
     // get endemia do input
     iFeature.type = endemia || 'DENGUE';
     // get week do input
-    const url = `http://tc1.sms.fortaleza.ce.gov.br/simda/chikungunya/mapaJSON?mapa=true&ano=${ano}&mes=&sem_pri=${ano}${semana}&classifin=&criterio=&evolucao=&regional=&id_bairro=&id_unidade=&key=0&anomapa=`;
+    const week = String(semana).padStart(2, '0');
+    const url = `http://tc1.sms.fortaleza.ce.gov.br/simda/chikungunya/mapaJSON?mapa=true&ano=${ano}&mes=&sem_pri=${ano}${week}&classifin=&criterio=&evolucao=&regional=&id_bairro=&id_unidade=&key=0&anomapa=`;
     const index = url.indexOf('sem_pri=');
     iFeature.year = url.substring(index + 8, index + 12) || '2020';
-    iFeature.week = url.substring(index + 12, index + 14) || '1';
+    iFeature.week = url.substring(index + 12, index + 14) || '01';
 
     console.log(iFeature);
     console.log(url);
