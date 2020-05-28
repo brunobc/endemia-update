@@ -71,8 +71,8 @@ function App() {
 
     // get latitude e longitude
     iFeature.features = features.map(function (value) {
-      const lon = value.geometry[coordinates][0].substring(0, 16);
-      const lat = value.geometry[coordinates][1].substring(1, 17);
+      const lon = value.geometry[coordinates][1].substring(9, 25);
+      const lat = value.geometry[coordinates][0].substring(10, 26);
 
       // console.log(parseFloat(Base64.decode(value.geometry[coordinates][1].substring(0, 16))));
       // console.log(parseFloat(Base64.decode(value.geometry[coordinates][1].substring(1, 17))));
@@ -96,16 +96,17 @@ function App() {
     console.log(iFeature);
     console.log(url);
 
-    if (false) {
-      let res = await featureService.insertFeature(iFeature);
-      setFeatures(iFeature);
-      console.log(res);
-      if (res.error) {
-        console.log(res.message);
-        toast.info('Document not found');
-        setLoading(false);
-      }
+    /*
+    Enviar os dados para o backend e salvar no mongp
+    let res = await featureService.insertFeature(iFeature);
+    setFeatures(iFeature);
+    console.log(res);
+    if (res.error) {
+      console.log(res.message);
+      toast.info('Document not found');
+      setLoading(false);
     }
+    */
   };
 
   return (
@@ -129,7 +130,7 @@ function App() {
               setTimeout(() => {
                 insertFeatures({
                   ...values,
-                  features: JSON.parse(values.features),
+                  features: JSON.parse(values.data).features,
                 });
                 setSubmitting(false);
               }, 100);
@@ -180,9 +181,8 @@ function App() {
                 />
                 <div style={{ width: '620px' }}>
                   <TextField
-                    label="features"
-                    name="features"
-                    value={values.features}
+                    name="data"
+                    value={values.data}
                     onChange={handleChange}
                     rows={10}
                     multiline
